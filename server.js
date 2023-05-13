@@ -6,7 +6,20 @@ const app = new Koa();
 const uuid = require('uuid');
 
 const tickets = [
-  // Ваши данные о билетах
+  {
+    id: 1,
+    name: 'Поменять краску в принтере',
+    description: 'Нужно поменять краску в принтере в бухгалтерии. Принтер HP 124J823',
+    status: 'false',
+    created: new Date(),
+  },
+  {
+    id: 2,
+    name: 'Переустановить Windows',
+    description: 'Переустановить ОС на ноутбуке офис менеджера',
+    status: 'true',
+    created: new Date(2021, 3, 3, 3, 3, 3),
+  }
 ];
 
 app.use(
@@ -25,22 +38,22 @@ app.use(koaBody({
   json: true,
 }));
 
-app.use(async (ctx, next) => {
+app.use(async ctx => {
   ctx.response.set({
     'Access-Control-Allow-Origin': '*',
-  });
+    });
   const { method } = ctx.request.query;
   switch (method) {
     case 'allTickets':
-      ctx.response.body = tickets.map(({ description, ...ticket }) => ticket);
+      ctx.response.body = tickets.map(({description, ...ticket}) => (ticket));
       return;
     case 'ticketById':
-      const { id: ticketId } = ctx.request.query;
+      const {id: ticketId} = ctx.request.query;
       const ticketToShow = tickets.find(ticket => ticket.id === parseInt(ticketId));
       if (ticketToShow) {
-        ctx.response.body = ticketToShow.description;
+          ctx.response.body = ticketToShow.description;
       } else {
-        ctx.response.status = 404;
+          ctx.response.status = 404;
       }
       return;
     case 'createTicket':
@@ -49,22 +62,21 @@ app.use(async (ctx, next) => {
         return;
       }
       const data = ctx.request.body;
-      
+                            
       const ticket = {
-        id: data.id ? parseInt(data.id) : tickets[tickets.length - 1].id + 1,
+        id: (data.id) ? parseInt(data.id) : (tickets[tickets.length - 1]).id + 1,
         name: data.name,
         description: data.description,
-        status: data.status ? data.status : 'false',
+        status: (data.status) ? data.status : 'false',
         created: new Date(),
       };
-      
+
       if (data.id) {
-        const indexTicket = tickets.findIndex(ticket => ticket.id === parseInt(data.id));
+        let indexTicket = tickets.findIndex(ticket => ticket.id === parseInt(data.id));
         tickets.splice(indexTicket, 1, ticket);
       } else {
         tickets.push(ticket);
-      }
-      
+      };
       ctx.response.status = 201;
       ctx.response.body = tickets;
       return;
@@ -73,7 +85,7 @@ app.use(async (ctx, next) => {
         ctx.response.status = 404;
         return;
       }
-      const { id: ticketToDelete } = ctx.request.query;
+      const {id: ticketToDelete} = ctx.request.query;
       const index = tickets.findIndex(ticket => ticket.id === parseInt(ticketToDelete));
       if (index === -1) {
         ctx.response.status = 404;
@@ -82,7 +94,7 @@ app.use(async (ctx, next) => {
       tickets.splice(index, 1);
       ctx.response.body = tickets;
       return;
-    default:
+      default:server.js
       ctx.response.status = 404;
       return;
   }
