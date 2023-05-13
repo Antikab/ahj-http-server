@@ -39,6 +39,7 @@ app.use(koaBody({
 }));
 
 app.use(async ctx => {
+  ctx.response.body = 'Добро пожаловать на сервер!';
   ctx.response.set({
     'Access-Control-Allow-Origin': '*',
     });
